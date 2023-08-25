@@ -18,7 +18,7 @@ packages:
   - linux-tools-virtual
   - linux-cloud-tools-virtual
   - linux-azure
-  - ejectF
+  - eject
 
 users:
   - name: jackbot
