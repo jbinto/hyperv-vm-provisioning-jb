@@ -1,0 +1,54 @@
+#cloud-config
+# vim: syntax=yaml
+# created: Aug/17/2023 02:15:14 -04
+
+hostname: operator.lynx-catfish.ts.net
+fqdn: operator.lynx-catfish.ts.net.domain.local
+
+growpart:
+  mode: auto
+  devices: [/]
+  ignore_growroot_disabled: false
+
+preserve_sources_list: true
+package_update: true
+package_upgrade: true
+package_reboot_if_required: true
+packages:
+  - linux-tools-virtual
+  - linux-cloud-tools-virtual
+  - linux-azure
+  - ejectF
+
+users:
+  - name: jackbot
+    no_user_group: true
+    groups: [sudo]
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    lock_passwd: true
+    plain_text_passwd: jackbot
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMaUYIj1CI93Sot2gdysLPN5VHQXCkrwCqT2VpkCtS7r ed25519-key-20230813
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC4or3ZkyrlyJCNEsaQqgaCRTjUCAaKRe6l7vO7GqobTdaqK5hJhZ23KY3eXtdD+3OGDoy69sEvKlWxv2vXB9pVLBHVzVw9zsDldoHf9Bvhoz5KK7sBfp4GAxPt2ZD4+XWo1EEPSh1mCWyPlrjwV0XmFzmv4XAxndI0W+8iUnhpITuVvn9R1KsE78zQdKwGFqLz8+RCrkvLjvCbYoL4fID62SsDQrFsb1t/iMk9OT5pg6BUgrX4fWiTRoS10ALOHmHK0kfXcW3beTpbuwUNXjDqPCGJ5WQaiKweDdzoU/tOotz83JL1im8q/T05xqNb4y8oTiWAy5BSO1+7KxIY6GFJviqztfVO+oMkmZVB1VtLOurCgrWw2wcVGsgX69vS0Z4LgS9CK/lMg4mSW99Yqv0B8id375jNcoIJCRAcr80TBinxsjYYBPfYyBzFPAO3UXVrUmfEEVHzPwyyZNXc8UDqQeOXHxN5ifRJ9pUMQllm5kf/4BZn9/wpVv9/9H20n40= jbinto@bugandgoose.cogeco.local
+
+disable_root: true    # true: notify default user account / false: allow root ssh login
+ssh_pwauth: false      # true: allow login with password; else only with setup pubkey(s)
+
+runcmd:
+  # - [ sh, -c, echo "127.0.0.1 localhost" >> /etc/hosts ]
+  # remove metadata iso
+  - [ sh, -c, "if test -b /dev/cdrom; then eject; fi" ]
+  - [ sh, -c, "if test -b /dev/sr0; then eject /dev/sr0; fi" ]
+  # disable cloud init on next boot (https://cloudinit.readthedocs.io/en/latest/topics/boot.html, https://askubuntu.com/a/1047618)
+  - [ sh, -c, touch /etc/cloud/cloud-init.disabled ]
+  # show ip address in output
+  - [ ifconfig ]
+
+power_state:
+  mode: reboot
+  message: Provisioning finished, will reboot ...
+  timeout: 1
+
+
+
